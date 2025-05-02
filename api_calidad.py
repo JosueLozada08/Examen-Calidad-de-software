@@ -5,13 +5,11 @@ from datetime import datetime, date
 import pandas as pd
 import io
 
-# Inicializar aplicación FastAPI
+
 app = FastAPI()
 
-# Variable global para almacenar el DataFrame
 clientes_df = pd.DataFrame()
 
-# Modelo para representar un cliente
 class Cliente(BaseModel):
     id: int
     nombres: str
@@ -22,12 +20,11 @@ class Cliente(BaseModel):
     email: str
     edad: int
 
-# Función para calcular la edad desde la fecha de nacimiento
+
 def calcular_edad(fecha_nac):
     today = date.today()
     return today.year - fecha_nac.year - ((today.month, today.day) < (fecha_nac.month, fecha_nac.day))
 
-# Cargar CSV con datos de clientes
 @app.post("/cargar_csv/")
 async def cargar_csv(file: UploadFile = File(...)):
     global clientes_df
@@ -39,7 +36,7 @@ async def cargar_csv(file: UploadFile = File(...)):
         if not all(col in df.columns for col in columnas_esperadas):
             raise HTTPException(status_code=400, detail="CSV no tiene todas las columnas requeridas.")
 
-        # Convertir fechas y calcular edad
+   
         df['fecha_nacimiento'] = pd.to_datetime(df['fecha_nacimiento'], errors='coerce')
         df['fecha_registro'] = pd.to_datetime(df['fecha_registro'], errors='coerce')
         df['edad'] = df['fecha_nacimiento'].apply(lambda x: calcular_edad(x) if pd.notnull(x) else None)
